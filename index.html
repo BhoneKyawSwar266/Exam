@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Result Checker</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: auto;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #1880ee;
+            text-decoration: underline;
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .row div {
+            margin-bottom: 15px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .inputs p {
+            margin: 0 0 5px 0;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #007BFF;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .img img {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        label {
+            display: block;
+            width: 170px;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px auto;
+            cursor: pointer;
+        }
+
+        .image-input {
+            display: none;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .modal-content img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+
+        .modal-content img{
+            object-fit: cover;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #modal_intro{
+            font-size: 26px;
+            padding: 5px auto;
+        }
+        
+        #modal_result{
+            font-size: 17px;}
+       #modal_result span{
+        font-weight: bold;
+       }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Exam Result Checker</h1>
+        <div class="inputs">
+            <div class="img">
+                <img src="img/profile.png" alt="" id="profile_pic">
+                <label for="input-file">Upload image</label>
+                <input type="file" accept="image/jpeg, image/png, image/jpg" id="input-file" class="image-input">
+            </div>
+            <div class="row">
+                <div>
+                    <p>Student Name:</p>
+                    <input type="text" id="studentName">
+                </div>
+                <div>
+                    <p>Student ID:</p>
+                    <input type="text" id="studentId">
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <p>Myanmar Score:</p>
+                    <input type="number" id="myanmar" min="0" max="100">
+                </div>
+                <div>
+                    <p>English:</p>
+                    <input type="number" id="english" min="0" max="100">
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <p>Mathematics:</p>
+                    <input type="number" id="mathematics" min="0" max="100">
+                </div>
+                <div>
+                    <p>Chemistry:</p>
+                    <input type="number" id="chemistry" min="0" max="100">
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <p>Physics:</p>
+                    <input type="number" id="physics" min="0" max="100">
+                </div>
+                <div>
+                    <p>Biology:</p>
+                    <input type="number" id="bio" min="0" max="100">
+                </div>
+            </div>
+        </div>
+        <button onclick="checkResult()">Check Result</button>
+    </div>
+
+    <!-- The Modal -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <img src="img/profile.png" alt="Profile Picture" id="modal_profile_pic">
+            <p id="modal_intro"></p>
+            <p id="modal_student_name"></p>
+            <p id="modal_student_id"></p>
+            <p id="modal_result"></p>
+        </div>
+    </div>
+
+    <script>
+        let profile_pic = document.getElementById("profile_pic");
+        let inputfile = document.getElementById('input-file');
+        let modal_profile_pic = document.getElementById("modal_profile_pic");
+
+        inputfile.onchange = function() {
+            profile_pic.src = URL.createObjectURL(inputfile.files[0]);
+            modal_profile_pic.src = URL.createObjectURL(inputfile.files[0]);
+        }
+
+        const start = () => {
+            setTimeout(function() {
+                confetti.start()
+            }, 500); // 1000 is time that after 1 second start the confetti ( 1000 = 1 sec)
+        };
+
+        // Stop
+        const stop = () => {
+            setTimeout(function() {
+                confetti.stop()
+            }, 9000); // 5000 is time that after 5 second stop the confetti ( 5000 = 5 sec)
+        };
+
+        function checkResult() {
+            const studentId = document.getElementById('studentId').value.trim();
+            const studentName = document.getElementById('studentName').value.trim();
+
+            const subjects = ["Myanmar", "English", "Mathematics", "Chemistry", "Physics", "Biology"];
+            const scores = [
+                parseInt(document.getElementById('myanmar').value),
+                parseInt(document.getElementById('english').value),
+                parseInt(document.getElementById('mathematics').value),
+                parseInt(document.getElementById('chemistry').value),
+                parseInt(document.getElementById('physics').value),
+                parseInt(document.getElementById('bio').value)
+            ];
+
+            if (!studentId || !studentName || scores.some(isNaN)) {
+                alert("Please enter all details and scores");
+                return;
+            }
+
+            const passScore = scores.every(score => score >= 40);
+            const distinctionScore = scores.some(score => score >= 80);
+
+            const isDistinction = (score) => score >= 80;
+            const isFailed = (score) => score < 40;
+
+            const distinctionSubjects = subjects.filter((subject, index) => isDistinction(scores[index]));
+            const failedSubjects = subjects.filter((subject, index) => isFailed(scores[index]));
+
+            let resultMessage = ``;
+
+            if (passScore) {
+                resultMessage += "Pass";
+                if (distinctionScore) {
+                    resultMessage += ` with Distinction in: <span style="color:#198754"> ${distinctionSubjects.join(', ')} </span>`;
+                }
+                document.getElementById('modal_intro').innerHTML = `Congratulations 😍🎉 <br> You Pass the Exam <span style="color:#007BFF">${studentName}</span> `;
+                start();
+                stop();
+            } else {
+                document.getElementById('modal_intro').innerHTML = `Sorry 😓😢<br> You fail the Exam <span style="color:#007BFF">${studentName}</span>`;
+                resultMessage += `Failed in: <span style="color:#dc3545"> ${failedSubjects.join(' , ')} </span>`
+            }
+
+            // Display the result in the modal
+            document.getElementById('modal_student_id').innerText = `Student ID: ${studentId}`;
+            document.getElementById('modal_result').innerHTML = resultMessage;
+
+            // Show the modal
+            document.getElementById('resultModal').style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').style.display = "none";
+        }
+    </script>
+    <script src="confetti.js"></script>
+</body>
+
+</html>
